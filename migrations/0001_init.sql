@@ -8,7 +8,16 @@ CREATE TABLE IF NOT EXISTS config (
 CREATE TABLE IF NOT EXISTS users (
   id TEXT PRIMARY KEY,
   email TEXT NOT NULL UNIQUE,
-  data TEXT NOT NULL,
+  name TEXT,
+  master_password_hash TEXT NOT NULL,
+  key TEXT NOT NULL,
+  private_key TEXT,
+  public_key TEXT,
+  kdf_type INTEGER NOT NULL,
+  kdf_iterations INTEGER NOT NULL,
+  kdf_memory INTEGER,
+  kdf_parallelism INTEGER,
+  security_stamp TEXT NOT NULL,
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
 );
@@ -23,9 +32,17 @@ CREATE TABLE IF NOT EXISTS user_revisions (
 CREATE TABLE IF NOT EXISTS ciphers (
   id TEXT PRIMARY KEY,
   user_id TEXT NOT NULL,
-  deleted_at TEXT,
-  updated_at TEXT NOT NULL,
+  type INTEGER NOT NULL,
+  folder_id TEXT,
+  name TEXT,
+  notes TEXT,
+  favorite INTEGER NOT NULL DEFAULT 0,
   data TEXT NOT NULL,
+  reprompt INTEGER,
+  key TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  deleted_at TEXT,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 CREATE INDEX IF NOT EXISTS idx_ciphers_user_updated ON ciphers(user_id, updated_at);
@@ -34,16 +51,20 @@ CREATE INDEX IF NOT EXISTS idx_ciphers_user_deleted ON ciphers(user_id, deleted_
 CREATE TABLE IF NOT EXISTS folders (
   id TEXT PRIMARY KEY,
   user_id TEXT NOT NULL,
+  name TEXT NOT NULL,
+  created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL,
-  data TEXT NOT NULL,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 CREATE INDEX IF NOT EXISTS idx_folders_user_updated ON folders(user_id, updated_at);
 
 CREATE TABLE IF NOT EXISTS attachments (
   id TEXT PRIMARY KEY,
-  cipher_id TEXT,
-  data TEXT NOT NULL,
+  cipher_id TEXT NOT NULL,
+  file_name TEXT NOT NULL,
+  size INTEGER NOT NULL,
+  size_name TEXT NOT NULL,
+  key TEXT,
   FOREIGN KEY (cipher_id) REFERENCES ciphers(id) ON DELETE CASCADE
 );
 CREATE INDEX IF NOT EXISTS idx_attachments_cipher ON attachments(cipher_id);

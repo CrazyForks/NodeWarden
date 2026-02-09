@@ -90,11 +90,11 @@ CREATE INDEX IF NOT EXISTS idx_folders_user_updated ON folders(user_id, updated_
 
 CREATE TABLE IF NOT EXISTS attachments (
   id TEXT PRIMARY KEY,
-  cipher_id TEXT,
+  cipher_id TEXT NOT NULL,
   file_name TEXT NOT NULL,
-  file_size INTEGER NOT NULL,
+  size INTEGER NOT NULL,
+  size_name TEXT NOT NULL,
   key TEXT,
-  data TEXT NOT NULL,
   FOREIGN KEY (cipher_id) REFERENCES ciphers(id) ON DELETE CASCADE
 );
 CREATE INDEX IF NOT EXISTS idx_attachments_cipher ON attachments(cipher_id);
